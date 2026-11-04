@@ -11,6 +11,17 @@ import numpy as np
 st.set_page_config(page_title="Machine Learning App", page_icon="🤖", layout="centered")
 
 BASE = Path(__file__).parent
+
+# Traduction d'affichage des valeurs des listes déroulantes (le modèle reçoit la valeur d'origine)
+FR = {'Morning': 'Matin', 'Afternoon': 'Après-midi', 'Evening': 'Soir', 'Night': 'Nuit',
+      'Weekday': 'Semaine', 'Weekend': 'Week-end', 'Low': 'Faible', 'Medium': 'Moyen', 'High': 'Élevé',
+      'Clear': 'Dégagé', 'Rain': 'Pluie', 'Snow': 'Neige',
+      'Petrol': 'Essence', 'Diesel': 'Diesel', 'CNG': 'GNC', 'Dealer': 'Concessionnaire', 'Individual': 'Particulier',
+      'Automatic': 'Automatique', 'Manual': 'Manuelle'}
+
+
+def fr(valeur):
+    return FR.get(valeur, valeur)
 # Nom du fichier du meilleur modèle sauvegardé dans chaque dossier (voir la fin de chaque notebook)
 MODEL_FILES = {'Car_Data': 'dt_model.joblib', 'Telephone': 'rf_model.joblib',
                'Car_Dataset': 'rf_model.joblib', 'Taxi_Trip': 'rf_model.joblib'}
@@ -65,33 +76,33 @@ def app_car_data():
     tab1, tab2 = st.tabs(['Simple Prédiction', 'Prédiction multiple'])
 
     with tab1:
-        st.subheader("Predict if a car is 'Venant' or 'D'occasion' with a single input")
-        st.write("""This machine learning model allows us to predict if a car is Venant or D'occasion
-                 from the brand, year, gearbox, address and price.""")
+        st.subheader("Prédire si une voiture est « Venant » ou « D'occasion » (une seule entrée)")
+        st.write("""Ce modèle de machine learning permet de prédire si une voiture est Venant ou D'occasion
+                 à partir de la marque, de l'année, de la boîte de vitesse, de l'adresse et du prix.""")
         with st.form('form_simple'):
             col1, col2 = st.columns(2)
             with col1:
                 Marque = st.selectbox('Marque', options=uniques[0])
                 Annee = st.number_input('Année', min_value=1990, max_value=2030, value=2015, step=1)
-                Boite_Vitesse = st.selectbox('Boite de vitesse', options=uniques[1])
+                Boite_Vitesse = st.selectbox('Boîte de vitesse', options=uniques[1])
             with col2:
                 Adresse = st.selectbox('Adresse', options=uniques[2])
                 Prix = st.number_input('Prix', min_value=0.0, value=7800000.0, step=100000.0)
-            submit = st.form_submit_button('Predict')
+            submit = st.form_submit_button('Prédire')
         if submit:
             y_pred = Pred_func(Marque, Annee, Boite_Vitesse, Adresse, Prix)
-            st.success(f"Venant_Occasion : {y_pred}")
+            st.success(f"Résultat : la voiture est **{y_pred}**")
 
     with tab2:
-        st.subheader("Predict if cars are 'Venant' or 'D'occasion' with multiple inputs")
-        st.write("""The csv file must contain the columns : Marque, Année, Boite_Vitesse, Adresse, Prix.""")
-        file = st.file_uploader('Upload a csv file', type=['csv'])
+        st.subheader("Prédire si des voitures sont « Venant » ou « D'occasion » (plusieurs entrées)")
+        st.write("""Le fichier csv doit contenir les colonnes : Marque, Année, Boite_Vitesse, Adresse, Prix.""")
+        file = st.file_uploader('Téléverser un fichier csv', type=['csv'])
         if file is not None:
             # Lire le fichier csv
             df = pd.read_csv(file)
             st.write("Aperçu des données chargées :")
             st.dataframe(df.head())
-            if st.button('Predict'):
+            if st.button('Prédire'):
                 try:
                     df_pred = Pred_func_csv(df)
                 except Exception as e:
@@ -100,7 +111,7 @@ def app_car_data():
                     st.write("Résultats des prédictions :")
                     st.dataframe(df_pred)
                     # Télécharger le fichier des prédictions
-                    st.download_button(label='Download a csv file',
+                    st.download_button(label='Télécharger le fichier csv',
                                        data=df_pred.to_csv(index=False).encode('utf-8'),
                                        file_name='predictions.csv', mime='text/csv')
 
@@ -139,9 +150,9 @@ def app_telephone():
     tab1, tab2 = st.tabs(['Simple Prédiction', 'Prédiction multiple'])
 
     with tab1:
-        st.subheader("Predict the condition of a phone with a single input")
-        st.write("""This machine learning model allows us to predict the condition of a phone
-                 (Neuf, Réconditionné, D'occasion or Venant) from the price, address, brand, screen size, RAM and storage.""")
+        st.subheader("Prédire l'état d'un téléphone (une seule entrée)")
+        st.write("""Ce modèle de machine learning permet de prédire l'état d'un téléphone
+                 (Neuf, Réconditionné, D'occasion ou Venant) à partir du prix, de l'adresse, de la marque, de l'écran, de la RAM et du stockage.""")
         with st.form('form_simple'):
             col1, col2 = st.columns(2)
             with col1:
@@ -152,21 +163,21 @@ def app_telephone():
                 dim_ecr = st.number_input("Dimension de l'écran", min_value=0.0, value=6.0, step=0.1)
                 ram = st.number_input('RAM', min_value=1, value=8, step=1)
                 stockage = st.number_input('Stockage', min_value=1, value=128, step=32)
-            submit = st.form_submit_button('Predict')
+            submit = st.form_submit_button('Prédire')
         if submit:
             y_pred = Pred_func(prix, adresse, marque, dim_ecr, ram, stockage)
-            st.success(f"Etat : {y_pred}")
+            st.success(f"Résultat : l'état du téléphone est **{y_pred}**")
 
     with tab2:
-        st.subheader("Predict the condition of phones with multiple inputs")
-        st.write("""The csv file must contain the columns : prix, adresse, marque, dim_ecr, ram, stockage.""")
-        file = st.file_uploader('Upload a csv file', type=['csv'])
+        st.subheader("Prédire l'état de plusieurs téléphones (plusieurs entrées)")
+        st.write("""Le fichier csv doit contenir les colonnes : prix, adresse, marque, dim_ecr, ram, stockage.""")
+        file = st.file_uploader('Téléverser un fichier csv', type=['csv'])
         if file is not None:
             # Lire le fichier csv
             df = pd.read_csv(file)
             st.write("Aperçu des données chargées :")
             st.dataframe(df.head())
-            if st.button('Predict'):
+            if st.button('Prédire'):
                 try:
                     df_pred = Pred_func_csv(df)
                 except Exception as e:
@@ -175,7 +186,7 @@ def app_telephone():
                     st.write("Résultats des prédictions :")
                     st.dataframe(df_pred)
                     # Télécharger le fichier des prédictions
-                    st.download_button(label='Download a csv file',
+                    st.download_button(label='Télécharger le fichier csv',
                                        data=df_pred.to_csv(index=False).encode('utf-8'),
                                        file_name='predictions.csv', mime='text/csv')
 
@@ -215,34 +226,34 @@ def app_car_dataset():
     tab1, tab2 = st.tabs(['Simple Prédiction', 'Prédiction multiple'])
 
     with tab1:
-        st.subheader("Predict the selling price of a car with a single input")
-        st.write("""This machine learning model allows us to predict the selling price of a car
-                 from the kilometers driven, present price, fuel type, seller type, transmission and age.""")
+        st.subheader("Prédire le prix de vente d'une voiture (une seule entrée)")
+        st.write("""Ce modèle de machine learning permet de prédire le prix de vente d'une voiture
+                 à partir du kilométrage, du prix actuel, du carburant, du type de vendeur, de la transmission et de l'âge.""")
         with st.form('form_simple'):
             col1, col2 = st.columns(2)
             with col1:
-                Kms_Driven = st.number_input('Kms Driven', min_value=0.0, value=70000.0, step=1000.0)
-                Present_Price = st.number_input('Present Price', min_value=0.0, value=15.0, step=0.5)
-                Fuel_Type = st.selectbox('Fuel Type', options=uniques[0])
+                Kms_Driven = st.number_input('Kilométrage (Kms_Driven)', min_value=0.0, value=70000.0, step=1000.0)
+                Present_Price = st.number_input('Prix actuel (Present_Price)', min_value=0.0, value=15.0, step=0.5)
+                Fuel_Type = st.selectbox('Carburant (Fuel_Type)', options=uniques[0], format_func=fr)
             with col2:
-                Seller_Type = st.selectbox('Seller Type', options=uniques[1])
-                Transmission = st.selectbox('Transmission', options=uniques[2])
-                Age = st.number_input('Age', min_value=0, value=8, step=1)
-            submit = st.form_submit_button('Predict')
+                Seller_Type = st.selectbox('Type de vendeur (Seller_Type)', options=uniques[1], format_func=fr)
+                Transmission = st.selectbox('Transmission', options=uniques[2], format_func=fr)
+                Age = st.number_input('Âge de la voiture (Age)', min_value=0, value=8, step=1)
+            submit = st.form_submit_button('Prédire')
         if submit:
             y_pred = Pred_func(Kms_Driven, Present_Price, Fuel_Type, Seller_Type, Transmission, Age)
-            st.success(f"Selling Price : {y_pred}")
+            st.success(f"Résultat : prix de vente estimé = **{y_pred}**")
 
     with tab2:
-        st.subheader("Predict the selling price of cars with multiple inputs")
-        st.write("""The csv file must contain the columns : Kms_Driven, Present_Price, Fuel_Type, Seller_Type, Transmission, Age.""")
-        file = st.file_uploader('Upload a csv file', type=['csv'])
+        st.subheader("Prédire le prix de vente de plusieurs voitures (plusieurs entrées)")
+        st.write("""Le fichier csv doit contenir les colonnes : Kms_Driven, Present_Price, Fuel_Type, Seller_Type, Transmission, Age.""")
+        file = st.file_uploader('Téléverser un fichier csv', type=['csv'])
         if file is not None:
             # Lire le fichier csv
             df = pd.read_csv(file)
             st.write("Aperçu des données chargées :")
             st.dataframe(df.head())
-            if st.button('Predict'):
+            if st.button('Prédire'):
                 try:
                     df_pred = Pred_func_csv(df)
                 except Exception as e:
@@ -251,7 +262,7 @@ def app_car_dataset():
                     st.write("Résultats des prédictions :")
                     st.dataframe(df_pred)
                     # Télécharger le fichier des prédictions
-                    st.download_button(label='Download a csv file',
+                    st.download_button(label='Télécharger le fichier csv',
                                        data=df_pred.to_csv(index=False).encode('utf-8'),
                                        file_name='predictions.csv', mime='text/csv')
 
@@ -294,42 +305,42 @@ def app_taxi():
     tab1, tab2 = st.tabs(['Simple Prédiction', 'Prédiction multiple'])
 
     with tab1:
-        st.subheader("Predict the price of a taxi trip with a single input")
-        st.write("""This machine learning model allows us to predict the price of a taxi trip
-                 from the trip distance, time of day, day of week, passenger count, traffic conditions, weather,
-                 base fare, per km rate, per minute rate and trip duration.""")
+        st.subheader("Prédire le prix d'une course de taxi (une seule entrée)")
+        st.write("""Ce modèle de machine learning permet de prédire le prix d'une course de taxi
+                 à partir de la distance, du moment de la journée, du jour de la semaine, du nombre de passagers, du trafic, de la météo,
+                 du tarif de base, du tarif par km, du tarif par minute et de la durée du trajet.""")
         with st.form('form_simple'):
             col1, col2 = st.columns(2)
             with col1:
-                Trip_Distance_km = st.number_input('Trip Distance (km)', min_value=0.0, value=25.0, step=0.5)
-                Time_of_Day = st.selectbox('Time of Day', options=uniques[0])
-                Day_of_Week = st.selectbox('Day of Week', options=uniques[1])
-                Passenger_Count = st.number_input('Passenger Count', min_value=1, max_value=4, value=2, step=1)
-                Traffic_Conditions = st.selectbox('Traffic Conditions', options=uniques[2])
+                Trip_Distance_km = st.number_input('Distance du trajet (km)', min_value=0.0, value=25.0, step=0.5)
+                Time_of_Day = st.selectbox('Moment de la journée', options=uniques[0], format_func=fr)
+                Day_of_Week = st.selectbox('Jour de la semaine', options=uniques[1], format_func=fr)
+                Passenger_Count = st.number_input('Nombre de passagers', min_value=1, max_value=4, value=2, step=1)
+                Traffic_Conditions = st.selectbox('Conditions de circulation', options=uniques[2], format_func=fr)
             with col2:
-                Weather = st.selectbox('Weather', options=uniques[3])
-                Base_Fare = st.number_input('Base Fare', min_value=0.0, value=3.5, step=0.1)
-                Per_Km_Rate = st.number_input('Per Km Rate', min_value=0.0, value=1.2, step=0.05)
-                Per_Minute_Rate = st.number_input('Per Minute Rate', min_value=0.0, value=0.3, step=0.01)
-                Trip_Duration_Minutes = st.number_input('Trip Duration (minutes)', min_value=0.0, value=60.0, step=1.0)
-            submit = st.form_submit_button('Predict')
+                Weather = st.selectbox('Météo', options=uniques[3], format_func=fr)
+                Base_Fare = st.number_input('Tarif de base', min_value=0.0, value=3.5, step=0.1)
+                Per_Km_Rate = st.number_input('Tarif par km', min_value=0.0, value=1.2, step=0.05)
+                Per_Minute_Rate = st.number_input('Tarif par minute', min_value=0.0, value=0.3, step=0.01)
+                Trip_Duration_Minutes = st.number_input('Durée du trajet (minutes)', min_value=0.0, value=60.0, step=1.0)
+            submit = st.form_submit_button('Prédire')
         if submit:
             y_pred = Pred_func(Trip_Distance_km, Time_of_Day, Day_of_Week, Passenger_Count, Traffic_Conditions,
                                Weather, Base_Fare, Per_Km_Rate, Per_Minute_Rate, Trip_Duration_Minutes)
-            st.success(f"Trip Price : {y_pred} $")
+            st.success(f"Résultat : prix estimé de la course = **{y_pred} $**")
 
     with tab2:
-        st.subheader("Predict the price of a taxi trip with multiple inputs")
-        st.write("""This machine learning model allows us to predict the price of a taxi trip
-                 from the trip distance, time of day, day of week, passenger count, traffic conditions, weather,
-                 base fare, per km rate, per minute rate and trip duration.""")
-        file = st.file_uploader('Upload a csv file', type=['csv'])
+        st.subheader("Prédire le prix de plusieurs courses de taxi (plusieurs entrées)")
+        st.write("""Ce modèle de machine learning permet de prédire le prix d'une course de taxi
+                 à partir de la distance, du moment de la journée, du jour de la semaine, du nombre de passagers, du trafic, de la météo,
+                 du tarif de base, du tarif par km, du tarif par minute et de la durée du trajet.""")
+        file = st.file_uploader('Téléverser un fichier csv', type=['csv'])
         if file is not None:
             # Lire le fichier csv
             df = pd.read_csv(file)
             st.write("Aperçu des données chargées :")
             st.dataframe(df.head())
-            if st.button('Predict'):
+            if st.button('Prédire'):
                 try:
                     df_pred = Pred_func_csv(df)
                 except Exception as e:
@@ -338,7 +349,7 @@ def app_taxi():
                     st.write("Résultats des prédictions :")
                     st.dataframe(df_pred)
                     # Télécharger le fichier des prédictions
-                    st.download_button(label='Download a csv file',
+                    st.download_button(label='Télécharger le fichier csv',
                                        data=df_pred.to_csv(index=False).encode('utf-8'),
                                        file_name='predictions.csv', mime='text/csv')
 
