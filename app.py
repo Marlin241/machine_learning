@@ -79,7 +79,7 @@ def app_car_data():
         st.subheader("Prédire si une voiture est « Venant » ou « D'occasion » (une seule entrée)")
         st.write("""Ce modèle de machine learning permet de prédire si une voiture est Venant ou D'occasion
                  à partir de la marque, de l'année, de la boîte de vitesse, de l'adresse et du prix.""")
-        with st.form('form_simple'):
+        with st.form('form_simple_car_data'):
             col1, col2 = st.columns(2)
             with col1:
                 Marque = st.selectbox('Marque', options=uniques[0])
@@ -96,13 +96,13 @@ def app_car_data():
     with tab2:
         st.subheader("Prédire si des voitures sont « Venant » ou « D'occasion » (plusieurs entrées)")
         st.write("""Le fichier csv doit contenir les colonnes : Marque, Année, Boite_Vitesse, Adresse, Prix.""")
-        file = st.file_uploader('Téléverser un fichier csv', type=['csv'])
+        file = st.file_uploader('Téléverser un fichier csv', type=['csv'], key='upload_car_data')
         if file is not None:
             # Lire le fichier csv
             df = pd.read_csv(file)
             st.write("Aperçu des données chargées :")
             st.dataframe(df.head())
-            if st.button('Prédire'):
+            if st.button('Prédire', key='predire_multiple_car_data'):
                 try:
                     df_pred = Pred_func_csv(df)
                 except Exception as e:
@@ -113,7 +113,8 @@ def app_car_data():
                     # Télécharger le fichier des prédictions
                     st.download_button(label='Télécharger le fichier csv',
                                        data=df_pred.to_csv(index=False).encode('utf-8'),
-                                       file_name='predictions.csv', mime='text/csv')
+                                       file_name='predictions.csv', mime='text/csv',
+                                       key='telecharger_car_data')
 
 
 # =====================================================================================
@@ -153,7 +154,7 @@ def app_telephone():
         st.subheader("Prédire l'état d'un téléphone (une seule entrée)")
         st.write("""Ce modèle de machine learning permet de prédire l'état d'un téléphone
                  (Neuf, Réconditionné, D'occasion ou Venant) à partir du prix, de l'adresse, de la marque, de l'écran, de la RAM et du stockage.""")
-        with st.form('form_simple'):
+        with st.form('form_simple_telephone'):
             col1, col2 = st.columns(2)
             with col1:
                 prix = st.number_input('Prix', min_value=0.0, value=360000.0, step=10000.0)
@@ -171,13 +172,13 @@ def app_telephone():
     with tab2:
         st.subheader("Prédire l'état de plusieurs téléphones (plusieurs entrées)")
         st.write("""Le fichier csv doit contenir les colonnes : prix, adresse, marque, dim_ecr, ram, stockage.""")
-        file = st.file_uploader('Téléverser un fichier csv', type=['csv'])
+        file = st.file_uploader('Téléverser un fichier csv', type=['csv'], key='upload_telephone')
         if file is not None:
             # Lire le fichier csv
             df = pd.read_csv(file)
             st.write("Aperçu des données chargées :")
             st.dataframe(df.head())
-            if st.button('Prédire'):
+            if st.button('Prédire', key='predire_multiple_telephone'):
                 try:
                     df_pred = Pred_func_csv(df)
                 except Exception as e:
@@ -188,7 +189,8 @@ def app_telephone():
                     # Télécharger le fichier des prédictions
                     st.download_button(label='Télécharger le fichier csv',
                                        data=df_pred.to_csv(index=False).encode('utf-8'),
-                                       file_name='predictions.csv', mime='text/csv')
+                                       file_name='predictions.csv', mime='text/csv',
+                                       key='telecharger_telephone')
 
 
 # =====================================================================================
@@ -229,7 +231,7 @@ def app_car_dataset():
         st.subheader("Prédire le prix de vente d'une voiture (une seule entrée)")
         st.write("""Ce modèle de machine learning permet de prédire le prix de vente d'une voiture
                  à partir du kilométrage, du prix actuel, du carburant, du type de vendeur, de la transmission et de l'âge.""")
-        with st.form('form_simple'):
+        with st.form('form_simple_car_dataset'):
             col1, col2 = st.columns(2)
             with col1:
                 Kms_Driven = st.number_input('Kilométrage (Kms_Driven)', min_value=0.0, value=70000.0, step=1000.0)
@@ -247,13 +249,13 @@ def app_car_dataset():
     with tab2:
         st.subheader("Prédire le prix de vente de plusieurs voitures (plusieurs entrées)")
         st.write("""Le fichier csv doit contenir les colonnes : Kms_Driven, Present_Price, Fuel_Type, Seller_Type, Transmission, Age.""")
-        file = st.file_uploader('Téléverser un fichier csv', type=['csv'])
+        file = st.file_uploader('Téléverser un fichier csv', type=['csv'], key='upload_car_dataset')
         if file is not None:
             # Lire le fichier csv
             df = pd.read_csv(file)
             st.write("Aperçu des données chargées :")
             st.dataframe(df.head())
-            if st.button('Prédire'):
+            if st.button('Prédire', key='predire_multiple_car_dataset'):
                 try:
                     df_pred = Pred_func_csv(df)
                 except Exception as e:
@@ -264,7 +266,8 @@ def app_car_dataset():
                     # Télécharger le fichier des prédictions
                     st.download_button(label='Télécharger le fichier csv',
                                        data=df_pred.to_csv(index=False).encode('utf-8'),
-                                       file_name='predictions.csv', mime='text/csv')
+                                       file_name='predictions.csv', mime='text/csv',
+                                       key='telecharger_car_dataset')
 
 
 # =====================================================================================
@@ -309,7 +312,7 @@ def app_taxi():
         st.write("""Ce modèle de machine learning permet de prédire le prix d'une course de taxi
                  à partir de la distance, du moment de la journée, du jour de la semaine, du nombre de passagers, du trafic, de la météo,
                  du tarif de base, du tarif par km, du tarif par minute et de la durée du trajet.""")
-        with st.form('form_simple'):
+        with st.form('form_simple_taxi'):
             col1, col2 = st.columns(2)
             with col1:
                 Trip_Distance_km = st.number_input('Distance du trajet (km)', min_value=0.0, value=25.0, step=0.5)
@@ -334,13 +337,13 @@ def app_taxi():
         st.write("""Ce modèle de machine learning permet de prédire le prix d'une course de taxi
                  à partir de la distance, du moment de la journée, du jour de la semaine, du nombre de passagers, du trafic, de la météo,
                  du tarif de base, du tarif par km, du tarif par minute et de la durée du trajet.""")
-        file = st.file_uploader('Téléverser un fichier csv', type=['csv'])
+        file = st.file_uploader('Téléverser un fichier csv', type=['csv'], key='upload_taxi')
         if file is not None:
             # Lire le fichier csv
             df = pd.read_csv(file)
             st.write("Aperçu des données chargées :")
             st.dataframe(df.head())
-            if st.button('Prédire'):
+            if st.button('Prédire', key='predire_multiple_taxi'):
                 try:
                     df_pred = Pred_func_csv(df)
                 except Exception as e:
@@ -351,7 +354,8 @@ def app_taxi():
                     # Télécharger le fichier des prédictions
                     st.download_button(label='Télécharger le fichier csv',
                                        data=df_pred.to_csv(index=False).encode('utf-8'),
-                                       file_name='predictions.csv', mime='text/csv')
+                                       file_name='predictions.csv', mime='text/csv',
+                                       key='telecharger_taxi')
 
 
 # =====================================================================================
